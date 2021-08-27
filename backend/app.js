@@ -3,7 +3,9 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-const session = require('express-session')
+const session = require('express-session');
+
+require('mysql');
 
 require('dotenv').config();
 
@@ -24,10 +26,36 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({
-  secret: '1234',
+  secret: '4321',
   resave: false,
   saveUninitialized: true
 }));
+
+const connection = require('./models/bd');
+
+secured = async (req, res, next) => {
+
+  try {
+
+    //console.log(req.session.id_usuario);
+
+    if (req.session.id_usuario) {
+
+      next();
+
+    } else {
+
+      res.redirect('/admin/login')
+
+    }
+
+  } catch (error) {
+
+    console.log(error);
+
+  }
+
+}
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
